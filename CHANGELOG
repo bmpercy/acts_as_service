@@ -1,4 +1,4 @@
-HEAD
+0.0.2
 ----
 
 * adding after_start and before_stop hooks
