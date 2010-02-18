@@ -1,0 +1,9 @@
+HEAD
+----
+
+* adding after_start and before_stop hooks
+
+0.0.1
+-----
+
+* initial implementation

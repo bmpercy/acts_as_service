@@ -1,0 +1,78 @@
+= acts_as_service
+
+== Overview
+
+A gem that gives you an easy way to make service-like code and spend all your
+effort on actually writing the code to get your job done.
+
+Limitations:
+* one process at a time
+* only been tested while running inside a Rails application
+  (e.g. script/runner MySrv.start). should work if you just specify a pidfile
+  explicitly, but needs a little testing
+* smooth shutdown depends on your work method returning frequently (however
+  long you run without returning from perform_work_chunk is how long it might
+  take for the service to shut down
+
+Allows you to:
+* start, stop, restart your process
+* ensures that only one of each process is running on a given machine (if this
+  is not desired, you can probably hack it or enhance to allow up to N
+  instances if you want
+* implement a method you want called over and over, and when the service is
+  supposed to shut down, it stops calling the method and exits
+* see what the PID is of the process by inspecting the pidfile
+* explicitly shutdown the process from within the service class (but you'll
+  still have to return from perform_work_chunk).
+* initiate shutdown of service externally by either calling MyService.stop or
+  adding 'shutdown' to the PID file.
+* hooks to execute methods after start or before stop
+
+== What to do
+
+require 'acts_as_service' # or add it to your Rails env as a config.gem
+
+class MyService
+
+  acts_as_service
+
+  def self.perform_work_chunk
+    # do stuff that returns in a short period (e.g. a few seconds or less)
+  end
+
+end
+
+you can get fancier and specify your process identifier and how long to sleep
+between calls to perform_work_chunk:
+
+class MyService
+
+  acts_as_service
+
+  def self.service_name
+    "MyAwesomeService"
+  end
+
+  def self.sleep_time
+    5 # seconds
+  end
+
+  def self.perform_work_chunk
+    # do stuff that returns in a short period (e.g. a few seconds or less)
+  end
+
+end
+
+== Maintaining acts_as_service
+
+Make sure you have jeweler.
+
+To build:
+
+     cd .../acts_as_service
+     rake gemspec
+     rake build
+
+To test:
+
+Sorry, little lazy here. Create a sample service class and letter rip!

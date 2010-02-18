@@ -21,6 +21,10 @@
 #                                  default is #{RAILS_ROOT}/tmp/pids/<underscore version of service name>
 #     - self.sleep_time: seconds to sleep between calls to peform_work_chunk
 #                        default: no sleep till brooklyn!
+#     - self.after_start: a hook to run a method after the service is started
+#                         but before first call to perform_work_chunk
+#     - self.before_stop: a hook to run a method before final shutdown (and
+#                         after last run to perform_work_chunk)
 #
 # you can also call self.shutdown() from within your perform_work_chunk
 # code to initiate a shutdown (don't just exit() because there's pidfile
@@ -60,7 +64,7 @@ module ActsAsService
 
           puts "#{_display_name} (#{_pid_file_pid}) is already running. Ignoring."
         else
-          # clean out a stale 
+          # clean out a stale pid
           if _status == ACTS_AS_SERVICE_PID_NO_PROCESS
             puts 'Pid file exists but process is not running. Removing old pid file.'
             File.delete(_pid_filename)
@@ -68,6 +72,9 @@ module ActsAsService
           puts "Starting #{_display_name} (#{_pid})...."
           puts "Run #{name}.stop to stop\n\n"
           File.open(_pid_filename, 'w') {|f| f.write(_pid.to_s) }
+          if self.respond_to?(:after_start)
+            after_start
+          end
           while (_status == ACTS_AS_SERVICE_RUNNING)
             # only sleep if asked to
             if self.respond_to?(:sleep_time)
@@ -82,7 +89,7 @@ module ActsAsService
       # it's owned by this process
       rescue Object => e
         puts "ERROR: #{e}\n#{e.respond_to?(:backtrace) ? e.backtrace.join("\n  ") : ''}"
-        puts "Exiting (#{_pid})"
+        puts "Exiting (#{_pid})\n"
         if _process_running?
           File.delete(_pid_filename)
         end
@@ -105,7 +112,7 @@ module ActsAsService
         while (_status != ACTS_AS_SERVICE_STOPPED)
           sleep(1)
         end
-        puts "#{_display_name} (#{pid_to_stop}) stopped"
+        puts "#{_display_name} (#{pid_to_stop}) stopped\n"
       end
     end
 
@@ -122,6 +129,9 @@ module ActsAsService
     # work is done and it should shut down (makes sense for cronjobs, say)
     #-----------------------------------------------------------------------------
     def shutdown
+      if self.respond_to?(:before_stop)
+        before_stop
+      end
       # change the pid file so the original process sees this 'stop' signal 
       File.open(_pid_filename, 'a') do |f|
         f.write("\n#{ACTS_AS_SERVICE_SHUTTING_DOWN}")
