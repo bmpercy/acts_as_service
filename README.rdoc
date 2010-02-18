@@ -32,36 +32,36 @@ Allows you to:
 
 require 'acts_as_service' # or add it to your Rails env as a config.gem
 
-class MyService
+  class MyService
 
-  acts_as_service
+    acts_as_service
 
-  def self.perform_work_chunk
-    # do stuff that returns in a short period (e.g. a few seconds or less)
+    def self.perform_work_chunk
+      # do stuff that returns in a short period (e.g. a few seconds or less)
+    end
+
   end
-
-end
 
 you can get fancier and specify your process identifier and how long to sleep
 between calls to perform_work_chunk:
 
-class MyService
+  class MyService
 
-  acts_as_service
+    acts_as_service
 
-  def self.service_name
-    "MyAwesomeService"
+    def self.service_name
+      "MyAwesomeService"
+    end
+
+    def self.sleep_time
+      5 # seconds
+    end
+
+    def self.perform_work_chunk
+      # do stuff that returns in a short period (e.g. a few seconds or less)
+    end
+
   end
-
-  def self.sleep_time
-    5 # seconds
-  end
-
-  def self.perform_work_chunk
-    # do stuff that returns in a short period (e.g. a few seconds or less)
-  end
-
-end
 
 == Maintaining acts_as_service
 
