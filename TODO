@@ -1,0 +1,9 @@
+TODOs
+-----
+
+put things in here that could be worked on
+
+* extricate the gem from needing to run within Rails (maybe nothing to do here,
+  maybe just coming up with different pidfile default path if RAILS_ROOT
+  isn't defined. but including class can always just specify explicit path and
+  should be fine

@@ -4,7 +4,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "acts_as_service"
-    gemspec.summary = "Makes it very easy to create a service-like class that's easy to start and stop"
+    gemspec.summary = "Makes it very easy to create a service-like class that's easy to start and stop, taken from work at discovereads.com"
     gemspec.description = <<-DESC
 A gem with a mixin to let you turn a class into something that runs like a service,
 which you can MyService.start, MyService.stop, and MyService.restart. It tracks
