@@ -21,6 +21,13 @@
 #                                  default is #{RAILS_ROOT}/tmp/pids/<underscore version of service name>
 #     - self.sleep_time: seconds to sleep between calls to peform_work_chunk
 #                        default: no sleep till brooklyn!
+#     - self.sleep_check_timeout: while 'sleeping' between work chunks, how many
+#                                 seconds to sleep between checking if the
+#                                 service has been shut down. default is 2 seconds,
+#                                 but you may want to override to make shorter
+#                                 (will give better resolution on sleep_time, but
+#                                 uses a little more cpu) or longer (if you don't
+#                                 care about how quickly the service shuts down)
 #     - self.after_start: a hook to run a method after the service is started
 #                         but before first call to perform_work_chunk
 #     - self.before_stop: a hook to run a method before final shutdown (and
@@ -50,6 +57,13 @@ module ActsAsService
   ACTS_AS_SERVICE_SHUTTING_DOWN = 'shutting down'
   ACTS_AS_SERVICE_PID_NO_PROCESS = 'pid no process'
 
+  # how long to sleep before checking to see if sleep time has elapsed...allows
+  # for sleeping for a long time between work chunks, but quicker response to
+  # shutdowns. this is measured in seconds
+  # this is the DEFAULT value if the service doesn't define the
+  # +sleep_check_timeout+ method itself
+  SLEEP_CHECK_TIMEOUT = 2
+
   def self.included(base)
     base.extend ClassMethods
   end
@@ -75,12 +89,25 @@ module ActsAsService
           if self.respond_to?(:after_start)
             after_start
           end
+          _sleep_till = Time.now - 1
           while (_status == ACTS_AS_SERVICE_RUNNING)
-            # only sleep if asked to
-            if self.respond_to?(:sleep_time)
-              sleep sleep_time
+            if Time.now >= _sleep_till
+              perform_work_chunk
+
+              # only reset sleep till if asked to; otherwise, just perform next
+              # work chunk right away (never change _sleep_till)
+              if self.respond_to?(:sleep_time)
+                _sleep_till = Time.now + self.sleep_time
+              end
+            else
+              _check_time_interval = if self.respond_to? :sleep_check_timeout
+                                       self.sleep_check_timeout
+                                     else
+                                       SLEEP_CHECK_TIMEOUT
+                                     end
+
+              sleep [_check_time_interval, _sleep_till - Time.now].min
             end
-            perform_work_chunk
           end
           puts "Shutting down #{_display_name} (#{_pid})"
           File.delete(_pid_filename)

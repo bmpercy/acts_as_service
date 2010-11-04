@@ -1,3 +1,7 @@
+0.0.3
+----
+* more intelligent sleeping between work chunks: sleeps for correct amount of time, but will allow shutdown anytime during the sleep (instead of forcing waiting until entire sleep time has elapsed)
+
 0.0.2
 ----
 
