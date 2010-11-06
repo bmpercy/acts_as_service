@@ -7,3 +7,5 @@ put things in here that could be worked on
   maybe just coming up with different pidfile default path if RAILS_ROOT
   isn't defined. but including class can always just specify explicit path and
   should be fine
+* incorporate ability for service to define a logger that will be used by
+  the acts as service infrastruture (vs. just logging to stdout)
