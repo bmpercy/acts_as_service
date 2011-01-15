@@ -37,6 +37,13 @@
 # code to initiate a shutdown (don't just exit() because there's pidfile
 # cleanup etc. to peform).
 #
+# if you'd like to have long-running work chunks that periodically check
+# for shutdowns, you can call _shutting_down? at any point, which will
+# return true if a shutdown has been initiated. However, recommend putting
+# reasonable amounts of work in each chunk and letting this service
+# infrastructure manage the decision-making about shutting down...it'll
+# in general keep your code cleaner.
+#
 # # my_service.rb:
 # 
 # require 'acts_as_service'
@@ -300,6 +307,14 @@ module ActsAsService
     #---------------------------------------------------------------------------
     def _process_running?
       return _pid == _pid_file_pid
+    end
+
+
+    # returns true if the service is in the process of shutting down. let
+    # subclasses access if they'd like
+    #---------------------------------------------------------------------------
+    def _shutting_down?
+      ACTS_AS_SERVICE_SHUTTING_DOWN == _status
     end
 
   end

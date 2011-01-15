@@ -10,9 +10,6 @@ Limitations:
 * only been tested while running inside a Rails application
   (e.g. script/runner MySrv.start). should work if you just specify a pidfile
   explicitly, but needs a little testing
-* smooth shutdown depends on your work method returning frequently (however
-  long you run without returning from perform_work_chunk is how long it might
-  take for the service to shut down
 
 Allows you to:
 * start, stop, restart your process
