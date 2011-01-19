@@ -96,15 +96,15 @@ module ActsAsService
           if self.respond_to?(:after_start)
             after_start
           end
-          _sleep_till = Time.now - 1
+          _sleep_till = Time.zone.now - 1
           while (_status == ACTS_AS_SERVICE_RUNNING)
-            if Time.now >= _sleep_till
+            if Time.zone.now >= _sleep_till
               perform_work_chunk
 
               # only reset sleep till if asked to; otherwise, just perform next
               # work chunk right away (never change _sleep_till)
               if self.respond_to?(:sleep_time)
-                _sleep_till = Time.now + self.sleep_time
+                _sleep_till = Time.zone.now + self.sleep_time
               end
             else
               _check_time_interval = if self.respond_to? :sleep_check_timeout
@@ -113,7 +113,7 @@ module ActsAsService
                                        SLEEP_CHECK_TIMEOUT
                                      end
 
-              sleep [_check_time_interval, _sleep_till - Time.now].min
+              sleep [_check_time_interval, _sleep_till - Time.zone.now].min
             end
           end
           puts "Shutting down #{_display_name} (#{_pid})"
