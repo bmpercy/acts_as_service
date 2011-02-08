@@ -1,6 +1,10 @@
 HEAD
 ----
 
+0.0.6
+----
+* fixed a bug that caused problems if two acts_as_service services are referenced within same process
+
 0.0.4
 ----
 * adding _shutting_down? method

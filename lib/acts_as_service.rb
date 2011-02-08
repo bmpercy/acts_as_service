@@ -197,26 +197,19 @@ module ActsAsService
     # fetches the service's name, using class name as default
     #---------------------------------------------------------------------------
     def _display_name
-      @@_display_name ||= (respond_to?(:service_name) ?
-                           service_name :
-                           name.split("::").last)
+      respond_to?(:service_name) ? service_name : name.split("::").last
     end
 
 
     # returns the pid filename
     #---------------------------------------------------------------------------
     def _pid_filename
-      if defined?(@@_pid_filename)
-        return @@_pid_filename
-      end
-
       if respond_to?(:service_pid_filename)
-        @@_pid_filename = service_pid_filename
+        return service_pid_filename
       else
-        @@_pid_filename = File.join(RAILS_ROOT, 'tmp', 'pids',
-                                    "#{_display_name.underscore.gsub(/\s+/, '_')}.pid")
+        return File.join(RAILS_ROOT, 'tmp', 'pids',
+                         "#{_display_name.underscore.gsub(/\s+/, '_')}.pid")
       end
-      return @@_pid_filename
     end
 
 
